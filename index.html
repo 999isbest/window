@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统警告 - 异化的梗表达</title>
+    <!-- 引入赛博朋克风格字体 Orbitron -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', 'Courier New', Courier, monospace;
+        }
+
+        /* 基础背景样式 - 增强深度感 */
+        body {
+            background: #0a0419;
+            background: linear-gradient(135deg, #0a0419 0%, #1a0b4b 50%, #2d127a 100%);
+            background-image:
+                linear-gradient(135deg, #0a0419 0%, #1a0b4b 50%, #2d127a 100%),
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 0, 128, 0.2) 0%, transparent 50%);
+            background-blend-mode: overlay;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translate(0, 0);
+        }
+
+        /* 警告状态背景 - 全屏抖动核心样式 */
+        body.warning-mode {
+            background: #190404;
+            background-image:
+                linear-gradient(135deg, #190404 0%, #4b0b0b 50%, #7a1212 100%),
+                radial-gradient(circle at 20% 80%, rgba(198, 119, 119, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 128, 0, 0.2) 0%, transparent 50%);
+            background-blend-mode: overlay;
+            animation:
+                background-flicker 0.3s infinite alternate,
+                full-screen-shake 0.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite alternate;
+        }
+
+        /* 扫描线效果 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 255, 0.05) 2px,
+                rgba(0, 255, 255, 0.05) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: scan-line-move 8s linear infinite;
+        }
+
+        body.warning-mode::before {
+            background: repeating-linear-gradient(
+                transparent,
+                transparent 2px,
+                rgba(255, 0, 0, 0.08) 2px,
+                rgba(255, 0, 0, 0.08) 4px
+            );
+            animation:
+                scan-line-move 2s linear infinite,
+                scan-line-shake 0.2s infinite alternate;
+            opacity: 0.8;
+        }
+
+        /* 鼠标跟随光点效果 */
+        .cursor-light {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            transition: width 0.2s, height 0.2s, background 0.5s;
+        }
+
+        body.warning-mode .cursor-light {
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+            animation: cursor-shake 0.2s infinite alternate;
+        }
+
+        /* 数字雨背景效果 */
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.warning-mode .matrix-bg {
+            color: #ff0000 !important;
+            opacity: 0.35;
+            animation: matrix-shake 0.2s infinite alternate;
+        }
+
+        /* 核心优化：弹窗视觉层次 */
+        .cyber-popup {
+            background: rgba(10, 4, 25, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 80%;
+            max-width: 550px;
+            height: 315px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: perspective(1200px) rotateX(2deg) rotateY(-1deg) translateZ(20px);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 0 20px rgba(0, 255, 255, 0.1),
+                0 0 20px rgba(0, 255, 255, 0.4),
+                0 0 40px rgba(153, 51, 255, 0.3),
+                0 8px 40px rgba(0, 0, 0, 0.5),
+                0 12px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid transparent;
+            background-clip: padding-box, border-box;
+            background-origin: padding-box, border-box;
+            background-image:
+                linear-gradient(rgba(10, 4, 25, 0.85), rgba(10, 4, 25, 0.85)),
+                linear-gradient(45deg, #00ffff, #9933ff);
+            animation:
+                popup-fade 0.8s ease-out,
+                popup-float 6s ease-in-out infinite,
+                popup-glow-pulse 4s ease-in-out infinite;
+        }
+
+        /* 警告状态弹窗 - 不再单独抖动，由全屏抖动主导 */
+        body.warning-mode .cyber-popup {
+            background: rgba(25, 4, 4, 0.85);
+            background-image:
+                linear-gradient(rgba(25, 4, 4, 0.85), rgba(25, 4, 4, 0.85)),
+                linear-gradient(45deg, #ff0000, #ff6666);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 0 20px rgba(255, 0, 0, 0.2),
+                0 0 20px rgba(255, 0, 0, 0.5),
+                0 0 40px rgba(255, 0, 0, 0.4),
+                0 8px 40px rgba(0, 0, 0, 0.5),
+                0 12px 60px rgba(0, 0, 0, 0.3);
+            animation:
+                popup-fade 0.8s ease-out,
+                popup-float 4s ease-in-out infinite,
+                popup-glow-pulse-warning 0.8s ease-in-out infinite;
+        }
+
+        /* 弹窗内部元素样式 */
+        .popup-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid;
+            border-image: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.5), transparent) 1;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: header-pulse 3s ease-in-out infinite alternate;
+        }
+
+        body.warning-mode .popup-header {
+            border-image: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.5), transparent) 1;
+        }
+
+        .warning-icon {
+            color: #00ffff;
+            font-size: 2.2rem;
+            margin-right: 1rem;
+            text-shadow:
+                0 0 8px #00ffff,
+                0 0 16px #00ffff,
+                0 0 24px #00ffff,
+                0 0 32px rgba(0, 255, 255, 0.6);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: icon-pulse 2s ease-in-out infinite;
+        }
+
+        body.warning-mode .warning-icon {
+            color: #ff0000;
+            text-shadow:
+                0 0 8px #ff0000,
+                0 0 16px #ff0000,
+                0 0 24px #ff0000,
+                0 0 32px rgba(255, 0, 0, 0.7);
+            animation: icon-pulse 1s ease-in-out infinite, icon-spin 2s linear infinite;
+        }
+
+        .popup-title {
+            color: #e0e0ff;
+            font-size: 1.6rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(224, 224, 255, 0.6);
+        }
+
+        body.warning-mode .popup-title {
+            color: #ffeeee;
+            text-shadow: 0 0 8px rgba(255, 238, 238, 0.6);
+        }
+
+        .highlight-cyan {
+            color: #00ffff;
+            text-shadow:
+                0 0 10px #00ffff,
+                0 0 20px #00ffff,
+                0 0 30px #00ffff,
+                0 0 40px #00ffff,
+                0 0 50px rgba(0, 255, 255, 0.8);
+            animation: pulse-cyan 2s ease-in-out infinite alternate;
+            font-weight: 800;
+            transform: scale(1.02);
+            display: inline-block;
+        }
+
+        .highlight-red {
+            color: #ff0000;
+            text-shadow:
+                0 0 10px #ff0000,
+                0 0 20px #ff0000,
+                0 0 30px #ff0000,
+                0 0 40px #ff0000,
+                0 0 50px rgba(255, 0, 0, 0.9);
+            animation: pulse-red 0.8s ease-in-out infinite alternate, glitch-red 0.5s infinite;
+            font-weight: 800;
+            text-stroke: 0.5px #ff0000;
+            -webkit-text-stroke: 0.5px #ff0000;
+            transform: scale(1.02);
+            display: inline-block;
+        }
+
+        .popup-content-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.2rem;
+            flex: 1;
+            align-items: center;
+        }
+
+        .popup-content {
+            color: #b3b3ff;
+            line-height: 1.8;
+            font-size: 1.25rem;
+            text-align: center;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            max-width: 500px;
+            text-shadow: 0 0 4px rgba(179, 179, 255, 0.3);
+            font-weight: 400;
+        }
+
+        body.warning-mode .popup-content {
+            color: #ffb3b3;
+            text-shadow: 0 0 4px rgba(255, 179, 179, 0.3);
+            animation: content-shake 0.2s infinite alternate;
+        }
+
+        .popup-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: auto;
+        }
+
+        .cyber-btn {
+            background: linear-gradient(45deg, #1a0b4b, #2d127a);
+            background-image: linear-gradient(45deg, #1a0b4b, #2d127a), linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+            background-blend-mode: overlay;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow:
+                0 0 10px rgba(0, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            transform: skew(-2deg);
+            animation: btn-breathe 3s ease-in-out infinite alternate;
+        }
+
+        body.warning-mode .cyber-btn {
+            background: linear-gradient(45deg, #4b0b0b, #7a1212);
+            background-image: linear-gradient(45deg, #4b0b0b, #7a1212), linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
+            background-blend-mode: overlay;
+            color: #ff0000;
+            border: 1px solid #ff0000;
+            box-shadow:
+                0 0 10px rgba(255, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            animation: btn-breathe-warning 0.8s ease-in-out infinite alternate;
+        }
+
+        .cyber-btn:hover {
+            transform: skew(-2deg) translateY(-3px);
+            box-shadow:
+                0 0 20px rgba(0, 255, 255, 0.6),
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            animation: btn-glow 0.5s ease-out forwards;
+        }
+
+        body.warning-mode .cyber-btn:hover {
+            background: linear-gradient(45deg, #7a1212, #4b0b0b);
+            background-image: linear-gradient(45deg, #7a1212, #4b0b0b), linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+            background-blend-mode: overlay;
+            box-shadow:
+                0 0 20px rgba(255, 0, 0, 0.7),
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .cyber-btn:active {
+            transform: skew(-2deg) translateY(1px);
+            box-shadow:
+                0 0 15px rgba(0, 255, 255, 0.4),
+                inset 0 1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        /* 动画定义 */
+        @keyframes full-screen-shake {
+            0% { transform: translate(0px, 0px) rotate(0deg); }
+            25% { transform: translate(-3px, 2px) rotate(-0.5deg); }
+            50% { transform: translate(3px, -2px) rotate(0.5deg); }
+            75% { transform: translate(-2px, 3px) rotate(-0.5deg); }
+            100% { transform: translate(2px, -1px) rotate(0.5deg); }
+        }
+
+        @keyframes scan-line-shake {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; transform: translateX(2px); }
+        }
+
+        @keyframes cursor-shake {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        @keyframes matrix-shake {
+            0% { transform: translate(0px, 0px); }
+            100% { transform: translate(1px, 1px); }
+        }
+
+        @keyframes content-shake {
+            0% { transform: translate(0px, 0px); }
+            50% { transform: translate(-1px, 1px); }
+            100% { transform: translate(1px, -1px); }
+        }
+
+        @keyframes popup-glow-pulse-warning {
+            0%, 100% {
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                    inset 0 0 20px rgba(255, 0, 0, 0.2),
+                    0 0 30px rgba(255, 0, 0, 0.7),
+                    0 0 50px rgba(255, 0, 0, 0.5),
+                    0 8px 40px rgba(0, 0, 0, 0.5),
+                    0 12px 60px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                    inset 0 0 20px rgba(255, 0, 0, 0.4),
+                    0 0 40px rgba(255, 0, 0, 0.9),
+                    0 0 60px rgba(255, 0, 0, 0.7),
+                    0 8px 40px rgba(0, 0, 0, 0.5),
+                    0 12px 60px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        @keyframes popup-glow-pulse {
+            0%, 100% { box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 0 20px rgba(0, 255, 255, 0.1),
+                0 0 20px rgba(0, 255, 255, 0.4),
+                0 0 40px rgba(153, 51, 255, 0.3),
+                0 8px 40px rgba(0, 0, 0, 0.5),
+                0 12px 60px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 0 20px rgba(0, 255, 255, 0.15),
+                0 0 25px rgba(0, 255, 255, 0.6),
+                0 0 45px rgba(153, 51, 255, 0.4),
+                0 8px 40px rgba(0, 0, 0, 0.5),
+                0 12px 60px rgba(0, 0, 0, 0.3); }
+        }
+
+        @keyframes header-pulse {
+            0% { opacity: 0.9; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.01); }
+        }
+
+        @keyframes btn-breathe {
+            0% { opacity: 0.9; box-shadow: 0 0 10px rgba(0, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
+            100% { opacity: 1; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
+        }
+
+        @keyframes btn-breathe-warning {
+            0% { opacity: 0.9; box-shadow: 0 0 10px rgba(255, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
+            100% { opacity: 1; box-shadow: 0 0 25px rgba(255, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
+        }
+
+        @keyframes btn-glow {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2); }
+            100% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.7), 0 4px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+        }
+
+        @keyframes scan-line-move {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
+        }
+
+        @keyframes popup-float {
+            0%, 100% { transform: perspective(1200px) rotateX(2deg) rotateY(-1deg) translateZ(20px) translateY(0); }
+            50% { transform: perspective(1200px) rotateX(2deg) rotateY(-1deg) translateZ(20px) translateY(-8px); }
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes icon-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes popup-fade {
+            0% { opacity: 0; transform: perspective(1200px) rotateX(2deg) rotateY(-1deg) translateZ(20px) translateY(20px) scale(0.95); }
+            100% { opacity: 1; transform: perspective(1200px) rotateX(2deg) rotateY(-1deg) translateZ(20px) translateY(0) scale(1); }
+        }
+
+        @keyframes background-flicker {
+            0% { opacity: 1; }
+            100% { opacity: 0.95; }
+        }
+
+        @keyframes pulse-cyan {
+            0% {
+                opacity: 0.8;
+                text-shadow: 0 0 8px #00ffff, 0 0 18px #00ffff, 0 0 28px #00ffff, 0 0 38px #00ffff, 0 0 48px rgba(0, 255, 255, 0.7);
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 12px #00ffff, 0 0 22px #00ffff, 0 0 32px #00ffff, 0 0 42px #00ffff, 0 0 52px rgba(0, 255, 255, 0.9);
+            }
+        }
+
+        @keyframes pulse-red {
+            0% {
+                opacity: 0.8;
+                text-shadow: 0 0 8px #ff0000, 0 0 18px #ff0000, 0 0 28px #ff0000, 0 0 38px #ff0000, 0 0 48px rgba(255, 0, 0, 0.8);
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 12px #ff0000, 0 0 22px #ff0000, 0 0 32px #ff0000, 0 0 42px #ff0000, 0 0 52px rgba(255, 0, 0, 1);
+            }
+        }
+
+        @keyframes glitch-red {
+            0%, 100% { transform: translate(0) scale(1.02); }
+            20% { transform: translate(-2px, 2px) scale(1.02); }
+            40% { transform: translate(-2px, -2px) scale(1.02); }
+            60% { transform: translate(2px, 2px) scale(1.02); }
+            80% { transform: translate(2px, -2px) scale(1.02); }
+        }
+
+        @keyframes matrix {
+            0% { transform: translateY(-100%); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+
+        @keyframes matrix-warning {
+            0% { transform: translateY(-100%); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateY(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 鼠标跟随光点 -->
+    <div class="cursor-light" id="cursorLight"></div>
+
+    <!-- 数字雨背景 -->
+    <div class="matrix-bg" id="matrix"></div>
+
+    <!-- 赛博朋克弹窗 -->
+    <div class="cyber-popup">
+        <div class="popup-header">
+            <div class="warning-icon">⚠</div>
+            <h1 class="popup-title" id="popupTitle">系统观测到<span class="highlight-cyan">网络语义场异常波动</span></h1>
+        </div>
+
+        <!-- 内容容器 -->
+        <div class="popup-content-wrapper">
+            <div class="popup-content" id="popupContent">
+                <p>随着传播范围的扩大，在流量至上的网络生态中，</p>
+                <p>“参考文献”梗的边界逐渐模糊，出现了<span class="highlight-cyan">表达功能的异化</span></p>
+            </div>
+        </div>
+
+        <div class="popup-actions">
+            <button class="cyber-btn" id="scanBtn">扫描异常波动</button>
+        </div>
+    </div>
+
+    <script>
+        // 生成数字雨效果
+        function createMatrixEffect(isWarning = false) {
+            const matrix = document.getElementById('matrix');
+            const chars = '01ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ';
+            const columns = Math.floor(window.innerWidth / 15);
+
+            matrix.innerHTML = '';
+
+            for (let i = 0; i < columns; i++) {
+                const column = document.createElement('div');
+                column.style.position = 'absolute';
+                column.style.left = `${i * 15}px`;
+                column.style.top = '0';
+                column.style.color = isWarning ? '#ff0000' : '#00ffff';
+                column.style.fontSize = '14px';
+
+                const baseSpeed = isWarning ? 1 : 5; // 警告状态数字雨更快
+                const speedVariation = isWarning ? 2 : 5;
+                const animationDuration = `${Math.random() * speedVariation + baseSpeed}s`;
+
+                if (isWarning) {
+                    column.style.animation = `matrix-warning ${animationDuration} linear infinite`;
+                    column.style.animationDelay = `${Math.random() * 1}s`; // 更短的延迟
+                } else {
+                    column.style.animation = `matrix ${animationDuration} ease-in-out infinite`;
+                    column.style.animationDelay = `${Math.random() * 5}s`;
+                }
+
+                let text = '';
+                const charCount = Math.floor(Math.random() * 40 + 15);
+                for (let j = 0; j < charCount; j++) {
+                    text += chars[Math.floor(Math.random() * chars.length)];
+                }
+                column.textContent = text;
+
+                matrix.appendChild(column);
+            }
+        }
+
+        // 初始化数字雨
+        createMatrixEffect();
+
+        // 窗口大小变化时重新生成数字雨
+        window.addEventListener('resize', () => {
+            const isWarning = document.body.classList.contains('warning-mode');
+            createMatrixEffect(isWarning);
+        });
+
+        // 鼠标跟随光点效果
+        const cursorLight = document.getElementById('cursorLight');
+        document.addEventListener('mousemove', (e) => {
+            cursorLight.style.left = `${e.clientX}px`;
+            cursorLight.style.top = `${e.clientY}px`;
+            cursorLight.style.width = `${150 + Math.random() * 20}px`;
+            cursorLight.style.height = `${150 + Math.random() * 20}px`;
+        });
+
+        // 按钮点击事件处理
+        const scanBtn = document.getElementById('scanBtn');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupContent = document.getElementById('popupContent');
+        const body = document.body;
+
+        scanBtn.addEventListener('click', function() {
+            this.textContent = '扫描中...';
+            this.disabled = true;
+
+            setTimeout(() => {
+                body.classList.add('warning-mode');
+                popupTitle.innerHTML = '<span class="highlight-red">系统警告</span>';
+                popupContent.innerHTML = `
+                    <p>检测到<span class="highlight-red">发生异化的梗表达</span>，</p>
+                    <p>即将跳转详情页面！</p>
+                `;
+                this.textContent = '确认';
+                this.disabled = false;
+                this.classList.add('warning-btn');
+                createMatrixEffect(true);
+
+                this.onclick = function() {
+                    this.style.boxShadow = '0 0 25px rgba(255, 0, 0, 0.9)';
+                    this.style.transform = 'skew(-2deg) translateY(-3px)';
+                    setTimeout(() => {
+                        this.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.3)';
+                        this.style.transform = 'skew(-2deg) translateY(0)';
+                        alert('即将跳转到详情页面！');
+                    }, 200);
+                };
+            }, 1500);
+
+            this.style.boxShadow = '0 0 25px rgba(0, 255, 255, 0.9)';
+            this.style.transform = 'skew(-2deg) translateY(-3px)';
+            setTimeout(() => {
+                if (!this.disabled) {
+                    this.style.boxShadow = '0 0 10px rgba(0, 255, 255, 0.2)';
+                    this.style.transform = 'skew(-2deg) translateY(0)';
+                }
+            }, 200);
+        });
+    </script>
+</body>
+</html>
