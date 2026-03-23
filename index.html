@@ -242,18 +242,19 @@
             display: inline-block;
         }
 
+        /* 关键修改：降低红色高亮文字的发光强度，调整颜色对比度 */
         .highlight-red {
-            color: #ff0000;
+            color: #ff4444; /* 从纯红改为浅红，提升可读性 */
             text-shadow:
-                0 0 10px #ff0000,
-                0 0 20px #ff0000,
-                0 0 30px #ff0000,
-                0 0 40px #ff0000,
-                0 0 50px rgba(255, 0, 0, 0.9);
+                0 0 4px #ff0000,    /* 减少发光层数和大小 */
+                0 0 8px #ff0000,
+                0 0 12px #ff0000,
+                0 0 16px rgba(255, 0, 0, 0.6); /* 降低透明度 */
             animation: pulse-red 0.8s ease-in-out infinite alternate, glitch-red 0.5s infinite;
             font-weight: 800;
-            text-stroke: 0.5px #ff0000;
-            -webkit-text-stroke: 0.5px #ff0000;
+            /* 移除文字描边，避免叠加发光后模糊 */
+            /* text-stroke: 0.5px #ff0000; */
+            /* -webkit-text-stroke: 0.5px #ff0000; */
             transform: scale(1.02);
             display: inline-block;
         }
@@ -317,7 +318,7 @@
             background: linear-gradient(45deg, #4b0b0b, #7a1212);
             background-image: linear-gradient(45deg, #4b0b0b, #7a1212), linear-gradient(to bottom, rgba(255,255,255,0.1), transparent);
             background-blend-mode: overlay;
-            color: #ff0000;
+            color: #ff4444; /* 按钮文字也调整为浅红，提升可读性 */
             border: 1px solid #ff0000;
             box-shadow:
                 0 0 10px rgba(255, 0, 0, 0.3),
@@ -481,23 +482,24 @@
             }
         }
 
+        /* 关键修改：调整红色脉冲动画的发光强度 */
         @keyframes pulse-red {
             0% {
-                opacity: 0.8;
-                text-shadow: 0 0 8px #ff0000, 0 0 18px #ff0000, 0 0 28px #ff0000, 0 0 38px #ff0000, 0 0 48px rgba(255, 0, 0, 0.8);
+                opacity: 0.9; /* 提高基础不透明度 */
+                text-shadow: 0 0 3px #ff0000, 0 0 6px #ff0000, 0 0 9px #ff0000, 0 0 12px rgba(255, 0, 0, 0.7);
             }
             100% {
                 opacity: 1;
-                text-shadow: 0 0 12px #ff0000, 0 0 22px #ff0000, 0 0 32px #ff0000, 0 0 42px #ff0000, 0 0 52px rgba(255, 0, 0, 1);
+                text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 15px #ff0000, 0 0 20px rgba(255, 0, 0, 0.8);
             }
         }
 
         @keyframes glitch-red {
             0%, 100% { transform: translate(0) scale(1.02); }
-            20% { transform: translate(-2px, 2px) scale(1.02); }
-            40% { transform: translate(-2px, -2px) scale(1.02); }
-            60% { transform: translate(2px, 2px) scale(1.02); }
-            80% { transform: translate(2px, -2px) scale(1.02); }
+            20% { transform: translate(-1px, 1px) scale(1.02); } /* 减小偏移量 */
+            40% { transform: translate(-1px, -1px) scale(1.02); }
+            60% { transform: translate(1px, 1px) scale(1.02); }
+            80% { transform: translate(1px, -1px) scale(1.02); }
         }
 
         @keyframes matrix {
